@@ -1,0 +1,3 @@
+Realiza un programa que cuenta cuantas veces aparece un carácter introducido por teclado en el
+fichero texto.txt y escribe en qué posiciones aparece ese carácter. Si el carácter es una letra,
+se deben controlar las apariciones de esa letra tanto en mayúscula como en minúscula.
