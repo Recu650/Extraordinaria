@@ -11,8 +11,11 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,20 +90,53 @@ public class MainH4E1
                 case 4:
                     int idFutbolista = Teclado.introInt("ID Futbolista Buscar");
                     String textoFutbolista = leerFicheroFutbolista(fichero, idFutbolista);
-                    if(textoFutbolista.equalsIgnoreCase("")){
+                    if (textoFutbolista.equalsIgnoreCase(""))
+                    {
                         System.out.println("No hay futbolistas con ese ID");
-                    }else{
+                    } else
+                    {
                         System.out.println(textoFutbolista);
                     }
                     break;
                 case 5:
-                    
+                    int idCambiar = Teclado.introInt("ID del jugador para cambiar de equipo:");
+                    if (buscarID(idCambiar, fichero) == true)
+                    {
+                        System.out.println(leerFicheroFutbolista(fichero, idCambiar));
+                        String equipoCambiar = Teclado.introString("Equipo nuevo: ");
+                        modificarEquipo(fichero, idCambiar, equipoCambiar);
+                    } else
+                    {
+                        System.out.println("Futbolista no encontrado");
+                    }
                     break;
                 case 6:
-
+                    int idModificar = Teclado.introInt("ID del jugador para modificar:");
+                    if (buscarID(idModificar, fichero) == true)
+                    {
+                        System.out.println(leerFicheroFutbolista(fichero, idModificar));
+                        System.out.println("Nuevos Datos:");
+                        Futbolista futbolistaModificado = crearFutbolista(idModificar);
+                        modificarJugador(fichero, futbolistaModificado);
+                    } else
+                    {
+                        System.out.println("Futbolista no encontrado");
+                    }
                     break;
                 case 7:
-
+                    int idEliminar = Teclado.introInt("ID del jugador para eliminar:");
+                    if (buscarID(idEliminar, fichero) == true)
+                    {
+                        System.out.println(leerFicheroFutbolista(fichero, idEliminar));
+                        boolean confirmacion = Teclado.introBoolean("Eliminar Jugador?:");
+                        if (confirmacion == true)
+                        {
+                            eliminarJugador(fichero, idEliminar);
+                        }
+                    } else
+                    {
+                        System.out.println("Futbolista no encontrado");
+                    }
                     break;
                 case 0:
                     break;
@@ -124,11 +160,17 @@ public class MainH4E1
 
             do
             {
-                buscaId = dis.readInt();
-                if (buscaId == id)
+                int idFutbolista = dis.readInt();
+                String alias = dis.readUTF();
+                String code = dis.readUTF();
+                Puesto puesto = Puesto.values()[dis.readInt()];
+                float altura = dis.readFloat();
+                Futbolista futbolista = new Futbolista(idFutbolista, alias, code, puesto, altura);
+                
+                if (futbolista.getId() == id)
                     resul = true;
-                //Si lo encuentra sale por aqui y cambia a true
-            } while (resul == false);
+                //Si lo encuentra cambia a true y sigue hasta terminar
+            } while (true);
         } catch (EOFException eof)
         {
             //Si no lo encuentra sale por aqui y lo deja en false
@@ -272,7 +314,7 @@ public class MainH4E1
         }
         return textoFichero;
     }
-    
+
     public static String leerFicheroFutbolista(File fichero, int idFutbolista)
     {
         FileInputStream fis = null;
@@ -289,11 +331,12 @@ public class MainH4E1
                 String codigo = dis.readUTF();
                 Puesto puesto = Puesto.values()[dis.readInt()];
                 float altura = dis.readFloat();
-                
-                if(id == idFutbolista){
+
+                if (id == idFutbolista)
+                {
                     Futbolista futbolista = new Futbolista(id, alias, codigo, puesto, altura);
                     textoFichero = textoFichero + futbolista.toString() + "\n";
-                }              
+                }
             } while (true);
         } catch (EOFException eof)
         {
@@ -313,5 +356,286 @@ public class MainH4E1
             }
         }
         return textoFichero;
+    }
+
+    public static void modificarEquipo(File fichero, int idCambiar, String nuevoEquipo)
+    {
+        FileInputStream fis = null;
+        DataInputStream dis = null;
+        boolean fin = false;
+        ArrayList<Futbolista> futbolistas = new ArrayList();
+
+        try
+        {
+            fis = new FileInputStream(fichero);
+            dis = new DataInputStream(new BufferedInputStream(fis));
+
+            do
+            {
+                int id = dis.readInt();
+                String alias = dis.readUTF();
+                String codigo = dis.readUTF();
+                Puesto puesto = Puesto.values()[dis.readInt()];
+                float altura = dis.readFloat();
+                Futbolista futbolista = new Futbolista(id, alias, codigo, puesto, altura);
+
+                if (futbolista.getId() == idCambiar)
+                {
+                    futbolista.setCodeEquipo(nuevoEquipo);
+                }
+
+                futbolistas.add(futbolista);
+
+            } while (!fin);
+        } catch (EOFException eof)
+        {
+        } catch (IOException ex)
+        {
+            System.out.println(ex.toString());
+        } finally
+        {
+            try
+            {
+                if (dis != null)
+                    dis.close();
+            } catch (IOException exc)
+            {
+                System.out.println("Error al cerrar");
+            }
+        }
+        
+        sobrescribirFichero(fichero, futbolistas);
+
+//        FileOutputStream fos = null;
+//        DataOutputStream dos = null;
+//
+//        try
+//        {
+//            fos = new FileOutputStream(fichero); //No pongo el true para que sobrescriba
+//            dos = new DataOutputStream(fos);
+//
+//            for (Futbolista futbolista : futbolistas)
+//            {
+//                dos.writeInt(futbolista.getId());
+//                dos.writeUTF(futbolista.getAlias());
+//                dos.writeUTF(futbolista.getCodeEquipo());
+//                dos.writeInt(futbolista.getPuesto().ordinal());
+//                dos.writeFloat(futbolista.getAltura());
+//            }
+//        } catch (IOException ex)
+//        {
+//            System.out.println(ex.toString());
+//        } finally
+//        {
+//            try
+//            {
+//                if (dos != null)
+//                    dos.close();
+//            } catch (IOException ex)
+//            {
+//                System.out.println("Error al cerrar");
+//            }
+//
+//        }
+
+    }
+
+    public static void modificarJugador(File fichero, Futbolista futbolistaCambiar)
+    {
+        FileInputStream fis = null;
+        DataInputStream dis = null;
+        boolean fin = false;
+        ArrayList<Futbolista> futbolistas = new ArrayList();
+
+        try
+        {
+            fis = new FileInputStream(fichero);
+            dis = new DataInputStream(new BufferedInputStream(fis));
+
+            do
+            {
+                int id = dis.readInt();
+                String alias = dis.readUTF();
+                String codigo = dis.readUTF();
+                Puesto puesto = Puesto.values()[dis.readInt()];
+                float altura = dis.readFloat();
+                Futbolista futbolista = new Futbolista(id, alias, codigo, puesto, altura);
+
+                if (futbolista.getId() == futbolistaCambiar.getId())
+                {
+                    futbolistas.add(futbolistaCambiar);
+                } else
+                {
+                    futbolistas.add(futbolista);
+                }
+
+            } while (!fin);
+        } catch (EOFException eof)
+        {
+        } catch (IOException ex)
+        {
+            System.out.println(ex.toString());
+        } finally
+        {
+            try
+            {
+                if (dis != null)
+                    dis.close();
+            } catch (IOException exc)
+            {
+                System.out.println("Error al cerrar");
+            }
+        }
+        
+        sobrescribirFichero(fichero, futbolistas);
+
+//        FileOutputStream fos = null;
+//        DataOutputStream dos = null;
+//
+//        try
+//        {
+//            fos = new FileOutputStream(fichero); //No pongo el true para que sobrescriba
+//            dos = new DataOutputStream(fos);
+//
+//            for (Futbolista futbolista : futbolistas)
+//            {
+//                dos.writeInt(futbolista.getId());
+//                dos.writeUTF(futbolista.getAlias());
+//                dos.writeUTF(futbolista.getCodeEquipo());
+//                dos.writeInt(futbolista.getPuesto().ordinal());
+//                dos.writeFloat(futbolista.getAltura());
+//            }
+//        } catch (IOException ex)
+//        {
+//            System.out.println(ex.toString());
+//        } finally
+//        {
+//            try
+//            {
+//                if (dos != null)
+//                    dos.close();
+//            } catch (IOException ex)
+//            {
+//                System.out.println("Error al cerrar");
+//            }
+//
+//        }
+
+    }
+
+    public static void eliminarJugador(File fichero, int idBorrar)
+    {
+        FileInputStream fis = null;
+        DataInputStream dis = null;
+        boolean fin = false;
+        ArrayList<Futbolista> futbolistas = new ArrayList();
+
+        try
+        {
+            fis = new FileInputStream(fichero);
+            dis = new DataInputStream(new BufferedInputStream(fis));
+
+            do
+            {
+                int id = dis.readInt();
+                String alias = dis.readUTF();
+                String codigo = dis.readUTF();
+                Puesto puesto = Puesto.values()[dis.readInt()];
+                float altura = dis.readFloat();
+                Futbolista futbolista = new Futbolista(id, alias, codigo, puesto, altura);
+
+                if (futbolista.getId() == idBorrar)
+                {
+
+                } else
+                {
+                    futbolistas.add(futbolista);
+                }
+
+            } while (!fin);
+        } catch (EOFException eof)
+        {
+        } catch (IOException ex)
+        {
+            System.out.println(ex.toString());
+        } finally
+        {
+            try
+            {
+                if (dis != null)
+                    dis.close();
+            } catch (IOException exc)
+            {
+                System.out.println("Error al cerrar");
+            }
+        }
+        
+        sobrescribirFichero(fichero, futbolistas);
+
+//        FileOutputStream fos = null;
+//        DataOutputStream dos = null;
+//
+//        try
+//        {
+//            fos = new FileOutputStream(fichero); //No pongo el true para que sobrescriba
+//            dos = new DataOutputStream(fos);
+//
+//            for (Futbolista futbolista : futbolistas)
+//            {
+//                dos.writeInt(futbolista.getId());
+//                dos.writeUTF(futbolista.getAlias());
+//                dos.writeUTF(futbolista.getCodeEquipo());
+//                dos.writeInt(futbolista.getPuesto().ordinal());
+//                dos.writeFloat(futbolista.getAltura());
+//            }
+//        } catch (IOException ex)
+//        {
+//            System.out.println(ex.toString());
+//        } finally
+//        {
+//            try
+//            {
+//                if (dos != null)
+//                    dos.close();
+//            } catch (IOException ex)
+//            {
+//                System.out.println("Error al cerrar");
+//            }
+//
+//        }
+
+    }
+    public static void sobrescribirFichero(File fichero, List<Futbolista> futbolistas){
+        FileOutputStream fos = null;
+        DataOutputStream dos = null;
+
+        try
+        {
+            fos = new FileOutputStream(fichero); //No pongo el true para que sobrescriba
+            dos = new DataOutputStream(fos);
+
+            for (Futbolista futbolista : futbolistas)
+            {
+                dos.writeInt(futbolista.getId());
+                dos.writeUTF(futbolista.getAlias());
+                dos.writeUTF(futbolista.getCodeEquipo());
+                dos.writeInt(futbolista.getPuesto().ordinal());
+                dos.writeFloat(futbolista.getAltura());
+            }
+        } catch (IOException ex)
+        {
+            System.out.println(ex.toString());
+        } finally
+        {
+            try
+            {
+                if (dos != null)
+                    dos.close();
+            } catch (IOException ex)
+            {
+                System.out.println("Error al cerrar");
+            }
+
+        }
     }
 }
