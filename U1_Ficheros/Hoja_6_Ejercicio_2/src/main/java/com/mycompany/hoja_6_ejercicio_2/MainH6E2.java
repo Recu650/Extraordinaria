@@ -3,83 +3,96 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.hoja_6_ejercicio_1;
+package com.mycompany.hoja_6_ejercicio_2;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author usuario
  */
-public class MainH6E1 {
+public class MainH6E2 {
 
     private static final File FICHERO = new File("futbolistas.csv");
 
     public static void main(String[] args) {
-        Scanner teclado = new Scanner(System.in);
         int select;
         do {
             System.out.println("|----------MENU----------|");
             System.out.println("| 1.List Futbolistas     |");
-            System.out.println("| 2.List Futbolistas Equi|");
-            System.out.println("| 3.Buscar Futbolista    |");
-            System.out.println("| 4.Crear Fichero Equipo |");
-            System.out.println("| 5.List Fichero Equipo  |");
-            System.out.println("| 6.Todos Ficheros Equipo|");
+            System.out.println("| 2.Add Futbolista       |");
+            System.out.println("| 3.ListFutbolistaPuesto |");
+            System.out.println("| 4.Futbolista Mas Alto  |");
+            System.out.println("| 5.Modi Puesto Futbolist|");
+            System.out.println("| 6.EliminarFutbolista   |");
             System.out.println("| 0.Salir                |");
             System.out.println("|------------------------|");
             System.out.println("| Selecciona opcion:     |");
-            select = teclado.nextInt();
+            select = Teclado.introInt("");
             System.out.println("|------------------------|");
             switch (select) {
                 case 1:
-                    ArrayList<Futbolista> futbolistas = leerCSV();
-                    for (Futbolista futbolista : futbolistas) {
+                    for (Futbolista futbolista : leerCSV()) {
                         System.out.println(futbolista.toCSV());
                     }
                     break;
                 case 2:
-                    String equipoBuscar = Teclado.introString("Equipo que buscas:");
-                    ArrayList<Futbolista> equipoFiltro = leerCSVFiltroEquipo(equipoBuscar);
-                    for (Futbolista futbolista : equipoFiltro) {
-                        System.out.println(futbolista.toCSV());
-                    }
+                    aniadirFutbolista();
                     break;
                 case 3:
-                    String aliasBuscar = Teclado.introString("Alias del futbolista que buscas:");
-                    ArrayList<Futbolista> futbolistasFiltro = leerCSVFiltroFutbolista(aliasBuscar);
-                    for (Futbolista futbolista : futbolistasFiltro) {
+                    System.out.println("[1-PORTERO, 2-DEFENSA, 3-CENTROCAMPISTA, 4-DELANTERO]");
+                    int nPuesto = 0;
+                    do {
+                        nPuesto = Teclado.introInt("Puesto para filtrar:");
+                    } while (nPuesto != 1 && nPuesto != 2 && nPuesto != 3 && nPuesto != 4);
+                    Puesto puesto = Puesto.values()[nPuesto - 1];
+
+                    for (Futbolista futbolista : leerCSVporPuesto(puesto)) {
                         System.out.println(futbolista.toCSV());
                     }
                     break;
                 case 4:
-                    String equipoBuscarFichero = Teclado.introString("Equipo que buscas:");
-                    ArrayList<Futbolista> equipoFiltroFichero = leerCSVFiltroEquipo(equipoBuscarFichero);
-                    escribirCSV(equipoFiltroFichero, equipoBuscarFichero);
+                    Futbolista futbolistaMasAlto = null;
+                    float alturaMax = Float.MIN_VALUE;
+
+                    for (Futbolista futbolista : leerCSV()) {
+                        if (futbolista.getAltura() > alturaMax) {
+                            alturaMax = futbolista.getAltura();
+                            futbolistaMasAlto = futbolista;
+                        }
+                    }
+
+                    System.out.println("Futbolista mas alto: " + futbolistaMasAlto.toCSV());
                     break;
                 case 5:
-                    String nombreFichero = Teclado.introString("Codigo del equipo:");
-                    File ficheroEquipo = new File(nombreFichero + ".csv");
-                    if(ficheroEquipo.exists()){
-                        System.out.println("EQUIPO " + nombreFichero);
-                        for(Futbolista futbolista: leerCSVFichero(ficheroEquipo)){
-                            System.out.println(futbolista.toString());
-                        }
-                    }else System.out.println("Fichero no encontrado");
+                    int idModificar = Teclado.introInt("ID del jugador a modifcar el puesto:");
+                    boolean modificado = modificarPuesto(idModificar);
+                    if (modificado == true)
+                        System.out.println("Jugador modificado correctamente");
+                    else
+                        System.out.println("Jugador no encontrado");
                     break;
+
                 case 6:
-                    //PREGUNTAR
+                    int idEliminar = Teclado.introInt("ID del jugador a eliminar:");
+                    boolean eliminado = eliminarFutbolista(idEliminar);
+                    if (eliminado == true)
+                        System.out.println("Jugador eliminado correctamente");
+                    else
+                        System.out.println("Jugador no encontrado");
+                    break;
+                case 7:
+                    break;
+                case 8:
+                    break;
+                case 9:
                     break;
                 case 0:
                     break;
@@ -128,111 +141,57 @@ public class MainH6E1 {
         return futbolistas;
     }
 
-    public static ArrayList<Futbolista> leerCSVFiltroEquipo(String equipoBuscar) {
-        ArrayList<Futbolista> futbolistas = new ArrayList();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(FICHERO));
-            String linea = br.readLine();
+    public static Futbolista futbolistaMaker() {
+        int id = Teclado.introInt("ID del Jugador:");
+        String nombre = Teclado.introString("Nombre del Jugador:");
+        String apellidos = Teclado.introString("Apellidos del Jugador:");
+        String alias = Teclado.introString("Alias del Jugador:");
 
-            while (linea != null) {
-                String[] campos = linea.split(",");
+        System.out.println("[1-PORTERO, 2-DEFENSA, 3-CENTROCAMPISTA, 4-DELANTERO]");
+        int nPuesto = 0;
+        do {
+            nPuesto = Teclado.introInt("Puesto del Jugador:");
+        } while (nPuesto != 1 && nPuesto != 2 && nPuesto != 3 && nPuesto != 4);
+        Puesto puesto = Puesto.values()[nPuesto - 1];
+        float altura = (float) Teclado.introDouble("Altura del Jugador:");
+        LocalDate fechaNacimiento = Teclado.introFecha("Fecha de Nacimiento del Jugador:");
+        String codigo = Teclado.introString("Codigo del Equipo del Jugador:");
 
-                int id = Integer.parseInt(campos[0]);
-                String nombre = campos[1];
-                String apellidos = campos[2];
-                String alias = campos[3];
-                Puesto puesto = Puesto.valueOf(campos[4]);
-                float altura = Float.parseFloat(campos[5]);
-                LocalDate fNacimiento = LocalDate.parse(campos[6]);
-                String code = campos[7];
-
-                if (equipoBuscar.equalsIgnoreCase(code)) {
-                    Futbolista futbolista = new Futbolista(id, nombre, apellidos, alias, puesto, altura, fNacimiento, code);
-                    futbolistas.add(futbolista);
-                }
-
-                linea = br.readLine();
-            }
-        } catch (IOException ex) {
-            System.out.println(ex.toString());
-        } finally {
-            // Cierro el buffer de lectura
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return futbolistas;
+        Futbolista futbolista = new Futbolista(id, nombre, apellidos, alias, puesto, altura, fechaNacimiento, codigo);
+        return futbolista;
     }
 
-    public static ArrayList<Futbolista> leerCSVFiltroFutbolista(String aliasBuscar) {
-        ArrayList<Futbolista> futbolistas = new ArrayList();
-        BufferedReader br = null;
+    public static void aniadirFutbolista() {
+        BufferedWriter bw = null;
+        Futbolista futbolista = futbolistaMaker();
         try {
-            br = new BufferedReader(new FileReader(FICHERO));
-            String linea = br.readLine();
-
-            while (linea != null) {
-                String[] campos = linea.split(",");
-
-                int id = Integer.parseInt(campos[0]);
-                String nombre = campos[1];
-                String apellidos = campos[2];
-                String alias = campos[3];
-                Puesto puesto = Puesto.valueOf(campos[4]);
-                float altura = Float.parseFloat(campos[5]);
-                LocalDate fNacimiento = LocalDate.parse(campos[6]);
-                String code = campos[7];
-
-                if (aliasBuscar.equalsIgnoreCase(alias)) {
-                    Futbolista futbolista = new Futbolista(id, nombre, apellidos, alias, puesto, altura, fNacimiento, code);
-                    futbolistas.add(futbolista);
-                }
-
-                linea = br.readLine();
-            }
+            bw = new BufferedWriter(new FileWriter(FICHERO, true)); //true para que no machaque 
+            bw.write(futbolista.toCSV() + "\n");
+            bw.close();
         } catch (IOException ex) {
             System.out.println(ex.toString());
-        } finally {
-            // Cierro el buffer de lectura
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return futbolistas;
     }
 
-    public static void escribirCSV(ArrayList<Futbolista> futbolistas, String equipoBuscar) {
-        //Para escribir en el fichero csv basta con escribir linea a linea
-        //En el formato correcto, para eso tenemos el metodo toCSV en la clase futbolista
-
+    public static void escribirCSV(ArrayList<Futbolista> futbolistas) {
         BufferedWriter bw = null;
 
         try {
-            String nombreFichero = equipoBuscar + ".csv";
-            bw = new BufferedWriter(new FileWriter(nombreFichero));
+            bw = new BufferedWriter(new FileWriter(FICHERO, false)); //false para que machaque 
             for (Futbolista futbolista : futbolistas) {
-                bw.write(futbolista.toCSV()); //Puede que falte + "\n"
+                bw.write(futbolista.toCSV() + "\n");
             }
             bw.close();
         } catch (IOException ex) {
             System.out.println(ex.toString());
         }
     }
-    
-    public static ArrayList<Futbolista> leerCSVFichero(File fichero) {
+
+    public static ArrayList<Futbolista> leerCSVporPuesto(Puesto puestoBuscado) {
         ArrayList<Futbolista> futbolistas = new ArrayList();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(fichero));
+            br = new BufferedReader(new FileReader(FICHERO));
             String linea = br.readLine();
 
             while (linea != null) {
@@ -248,7 +207,10 @@ public class MainH6E1 {
                 String code = campos[7];
 
                 Futbolista futbolista = new Futbolista(id, nombre, apellidos, alias, puesto, altura, fNacimiento, code);
-                futbolistas.add(futbolista);
+
+                if (futbolista.getPuesto().toString().equalsIgnoreCase(puestoBuscado.toString())) {
+                    futbolistas.add(futbolista);
+                }
 
                 linea = br.readLine();
             }
@@ -265,5 +227,108 @@ public class MainH6E1 {
             }
         }
         return futbolistas;
+    }
+
+    public static boolean eliminarFutbolista(int idEliminar) {
+        boolean eliminado = false;
+        ArrayList<Futbolista> futbolistas = new ArrayList();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(FICHERO));
+            String linea = br.readLine();
+
+            while (linea != null) {
+                String[] campos = linea.split(",");
+
+                int id = Integer.parseInt(campos[0]);
+                String nombre = campos[1];
+                String apellidos = campos[2];
+                String alias = campos[3];
+                Puesto puesto = Puesto.valueOf(campos[4]);
+                float altura = Float.parseFloat(campos[5]);
+                LocalDate fNacimiento = LocalDate.parse(campos[6]);
+                String code = campos[7];
+
+                Futbolista futbolista = new Futbolista(id, nombre, apellidos, alias, puesto, altura, fNacimiento, code);
+                if (futbolista.getIdJugador() == idEliminar) {
+                    eliminado = true;
+                } else {
+                    futbolistas.add(futbolista);
+                }
+
+                linea = br.readLine();
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        } finally {
+            // Cierro el buffer de lectura
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        escribirCSV(futbolistas);
+        return eliminado;
+    }
+
+    public static boolean modificarPuesto(int idModificar) {
+        boolean modificado = false;
+        ArrayList<Futbolista> futbolistas = new ArrayList();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(FICHERO));
+            String linea = br.readLine();
+
+            while (linea != null) {
+                String[] campos = linea.split(",");
+
+                int id = Integer.parseInt(campos[0]);
+                String nombre = campos[1];
+                String apellidos = campos[2];
+                String alias = campos[3];
+                Puesto puesto = Puesto.valueOf(campos[4]);
+                float altura = Float.parseFloat(campos[5]);
+                LocalDate fNacimiento = LocalDate.parse(campos[6]);
+                String code = campos[7];
+
+                Futbolista futbolista = new Futbolista(id, nombre, apellidos, alias, puesto, altura, fNacimiento, code);
+                if (futbolista.getIdJugador() == idModificar) {
+                    modificado = true;
+                    System.out.println(futbolista.toCSV());
+
+                    System.out.println("[1-PORTERO, 2-DEFENSA, 3-CENTROCAMPISTA, 4-DELANTERO]");
+                    int nPuesto = 0;
+                    do {
+                        nPuesto = Teclado.introInt("Nuevo Puesto del Jugador:");
+                    } while (nPuesto != 1 && nPuesto != 2 && nPuesto != 3 && nPuesto != 4);
+                    Puesto puestoNuevo = Puesto.values()[nPuesto - 1];
+                    futbolista.setPuesto(puestoNuevo);
+                    
+                    futbolistas.add(futbolista);
+                } else {
+                    futbolistas.add(futbolista);
+                }
+
+                linea = br.readLine();
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        } finally {
+            // Cierro el buffer de lectura
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        escribirCSV(futbolistas);
+        return modificado;
     }
 }
