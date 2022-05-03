@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Futbolistas>
+    <Futbolista equipo="TOR">
+        <num>1</num>
+        <alias>Recu</alias>
+        <posicion>DEFENSA</posicion>
+    </Futbolista>
+    <Futbolista equipo="TOR">
+        <num>2</num>
+        <alias>Rina</alias>
+        <posicion>PORTERO</posicion>
+    </Futbolista>
+    <Futbolista equipo="TOR">
+        <num>3</num>
+        <alias>Meda</alias>
+        <posicion>DELANTERO</posicion>
+    </Futbolista>
+</Futbolistas>
