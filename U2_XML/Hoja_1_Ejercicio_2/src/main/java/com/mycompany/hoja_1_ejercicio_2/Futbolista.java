@@ -90,7 +90,7 @@ public class Futbolista {
                 puestoString = "DEFENSA";
                 break;
             case 3:
-                puestoString = "CENTROCAMPISTA";
+                puestoString = "CENTROCAMP";
                 break;
             case 4:
                 puestoString = "DELANTERO";
