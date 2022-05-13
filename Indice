@@ -1,8 +1,21 @@
-Indice:
+    Indice:
 
-* Unidad 1 Manejo de Ficheros.
-    * Hoja 3 [Ficheros de texto (flujo de caracteres)].
-        * Ejercicio 1: FileInputStream, FileOutputStream, CambiarMaysMinus
-        * Ejercicio 2: FileInputStream, ContadorDeCaracteres
-        * Ejercicio 3: Meter, Ver y Sacar datos de un fichero [Preguntar Borrar!]
-        * Ejercicio 4: Separar datos leidos de caracter en caracter
+    * Unidad 1 Manejo de Ficheros.
+        * Hoja_3 - Flujo de Caracteres (.txt)
+        * Hoja_4 - Ficheros Binarios (.dat)
+        * Hoja_6 - Ficheros CSV (.csv)
+
+    * Unidad 2 Manejo de Ficheros XML
+        * Hoja_1 - Lectura y Escritura mediante DOM
+        * Hoja_2 - Lectura y Escritura mediante SAX
+        * Hoja_5 - Consulta de Servicios Web  REST
+
+    * Unidad 3 BD No SQL
+        * Hoja_1 - Operaciones CRUD en MongoDB
+        * Hoja_2 - Operaciones CRUD en MongoDB
+        * Hoja_3 - Consultas en MongoDB
+        * Hoja_4 - Conexion Java con MongoDB
+        * Hoja_5 - Programacion Java con MongoDB
+        * Hoja_6 - Consultas Avanzadas Java MongoDB
+        * Hoja_7 - Consultas Avanzadas Java MongoDB
+
