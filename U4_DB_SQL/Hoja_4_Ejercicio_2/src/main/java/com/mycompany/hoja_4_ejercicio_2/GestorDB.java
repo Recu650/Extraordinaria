@@ -17,31 +17,27 @@ import java.util.logging.Logger;
  *
  * @author usuario
  */
-public class GestorDB {
+public class GestorDB
+{
     private Connection conexion;
 
-    public GestorDB() {
-        try {
-            Class.forName("org.postgresql.Driver");
-            conexion = DriverManager.getConnection(
-                    "jdbc:postgresql://127.0.0.1/concursomusicacompleto",
-                    "postgres", "PassWd!10");
-        } catch (ClassNotFoundException ex) {
-            System.out.println(ex.toString());
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-        }
+    public GestorDB()
+    {
+        this.conexion = Conexion.getInstance().getConnection();
     }
 
-    public List<Grupo> listadoGrupos() {
+    public List<Grupo> listadoGrupos()
+    {
         List<Grupo> grupos = new ArrayList();
         String sql = "SELECT * FROM grupos ORDER BY codgrupo ASC";
 
-        try {
+        try
+        {
             Statement st = conexion.createStatement();
             ResultSet result = st.executeQuery(sql);
 
-            while (result.next()) {
+            while (result.next())
+            {
                 Grupo grupo = new Grupo();
 
                 grupo.setCodgrupo(result.getBigDecimal("codgrupo"));
@@ -54,21 +50,25 @@ public class GestorDB {
 
                 grupos.add(grupo);
             }
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
         return grupos;
     }
 
-    public List<Grupo> listadoGruposCanciones() {
+    public List<Grupo> listadoGruposCanciones()
+    {
         List<Grupo> grupos = new ArrayList();
 
-        try {
+        try
+        {
             String sqlGrupo = "SELECT * FROM grupos ORDER BY nombre ASC";
             Statement stGrupo = conexion.createStatement();
             ResultSet resultGrupo = stGrupo.executeQuery(sqlGrupo);
 
-            while (resultGrupo.next()) {
+            while (resultGrupo.next())
+            {
                 int codGrupo = resultGrupo.getInt("codgrupo");
 
                 Grupo grupo = new Grupo();
@@ -86,7 +86,8 @@ public class GestorDB {
                 Statement stCancion = conexion.createStatement();
                 ResultSet resultCancion = stCancion.executeQuery(sqlCancion);
 
-                while (resultCancion.next()) {
+                while (resultCancion.next())
+                {
                     Cancion cancion = new Cancion();
 
                     cancion.setDuracion(resultCancion.getTime("duracion"));
@@ -100,22 +101,26 @@ public class GestorDB {
                 grupos.add(grupo);
             }
             return grupos;
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
         return grupos;
     }
 
-    public List<Cancion> cancionesUnGrupo(String grupo) {
+    public List<Cancion> cancionesUnGrupo(String grupo)
+    {
         List<Cancion> canciones = new ArrayList();
-        try {
+        try
+        {
             String sql = "SELECT numcancion, duracion, titulo FROM canciones "
-                    + "INNER JOIN grupos ON canciones.grupos = grupos.codgrupo "
+                    + "INNER JOIN grupos ON canciones.grupo = grupos.codgrupo "
                     + "WHERE grupos.nombre = '" + grupo + "';";
             Statement st = conexion.createStatement();
             ResultSet result = st.executeQuery(sql);
 
-            while (result.next()) {
+            while (result.next())
+            {
                 Cancion cancion = new Cancion();
 
                 cancion.setNumcancion(result.getInt("numcancion"));
@@ -124,42 +129,51 @@ public class GestorDB {
 
                 canciones.add(cancion);
             }
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
         return canciones;
     }
 
-    public List<Cancion> cancionesMasVotadas() {
+    public List<Cancion> cancionesMasVotadas()
+    {
         List<Cancion> canciones = new ArrayList();
-        try {
+        try
+        {
             String sql = "SELECT canciones.total_votos, canciones.titulo, grupos.nombre FROM canciones "
                     + "INNER JOIN grupos ON canciones.grupo = grupos.codgrupo "
-                    + "ORDER BY total_votos DESC";
+                    + "ORDER BY total_votos DESC LIMIT 5";
 
             Statement st = conexion.createStatement();
             ResultSet result = st.executeQuery(sql);
 
-            Cancion cancion = new Cancion();
-            Grupo grupo = new Grupo();
+            while (result.next())
+            {
+                Cancion cancion = new Cancion();
+                Grupo grupo = new Grupo();
 
-            cancion.setTotal_votos(result.getInt("total_votos"));
-            cancion.setTitulo(result.getString("titulo"));
-            grupo.setNombre(result.getString("nombre"));
+                cancion.setTotal_votos(result.getInt("total_votos"));
+                cancion.setTitulo(result.getString("titulo"));
+                grupo.setNombre(result.getString("nombre"));
 
-            cancion.setGrupo(grupo);
+                cancion.setGrupo(grupo);
 
-            canciones.add(cancion);
-        } catch (SQLException ex) {
+                canciones.add(cancion);
+            }
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
         return canciones;
     }
 
-    public List<Voto> votosMasRecientes() {
+    public List<Voto> votosMasRecientes()
+    {
         List<Voto> votos = new ArrayList();
 
-        try {
+        try
+        {
             String sql = "SELECT canciones.titulo, votos.fecha, grupos.nombre FROM canciones "
                     + "INNER JOIN votos ON canciones.numcancion = votos.cancion "
                     + "INNER JOIN grupos ON canciones.grupo = grupos.codgrupo "
@@ -168,7 +182,8 @@ public class GestorDB {
             Statement st = conexion.createStatement();
             ResultSet result = st.executeQuery(sql);
 
-            while (result.next()) {
+            while (result.next())
+            {
                 Cancion cancion = new Cancion();
                 Grupo grupo = new Grupo();
                 Voto voto = new Voto();
@@ -183,16 +198,19 @@ public class GestorDB {
 
                 votos.add(voto);
             }
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
         return votos;
     }
 
-    public int eliminarCancionesGrupo(String nombreGrupo) {
+    public int eliminarCancionesGrupo(String nombreGrupo)
+    {
         int resultCanciones = 0;
-        try {
-            String sqlVotos = "DELETE form votos "
+        try
+        {
+            String sqlVotos = "DELETE FROM votos "
                     + "USING canciones, grupos "
                     + "WHERE votos.cancion = canciones.numcancion "
                     + "AND canciones.grupo = grupos.codgrupo "
@@ -213,20 +231,23 @@ public class GestorDB {
             resultCanciones = stCanciones.executeUpdate(sqlCanciones);
             //Result es el numero de filas afectadas por Update
 
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
         return resultCanciones;
     }
 
-    public void modificarGrupo(String nombreGrupo) {
-        try {
+    public void modificarGrupo(String nombreGrupo)
+    {
+        try
+        {
             String sqlSelect = "SELECT * FROM grupos WHERE nombre = '" + nombreGrupo + "';";
-            
+
             Statement st = conexion.createStatement();
             ResultSet result = st.executeQuery(sqlSelect);
             result.next();
-            
+
             Grupo grupo = new Grupo();
             grupo.setCodgrupo(result.getBigDecimal("codgrupo"));
             grupo.setNombre(result.getString("nombre"));
@@ -235,8 +256,8 @@ public class GestorDB {
             grupo.setEsgrupo(result.getBoolean("esgrupo"));
             grupo.setAnnograb(result.getInt("annograb"));
             grupo.setFechaestreno(result.getDate("fechaestreno"));
-            grupo.setCompania(result.getString("compania"));                     
-            
+            grupo.setCompania(result.getString("compania"));
+
             System.out.println("codgrupo: " + grupo.getCodgrupo());
             System.out.println("nombre: " + grupo.getNombre());
             System.out.println("localidad: " + grupo.getLocalidad());
@@ -244,8 +265,8 @@ public class GestorDB {
             System.out.println("esgrupo: " + grupo.isEsgrupo());
             System.out.println("annograb: " + grupo.getAnnograb());
             System.out.println("fechaestreno: " + grupo.getFechaestreno());
-            System.out.println("compania: " + grupo.getCompania()); 
-                     
+            System.out.println("compania: " + grupo.getCompania());
+
             int select;
 
             System.out.println("|----------MENU----------|");
@@ -264,7 +285,7 @@ public class GestorDB {
             switch (select)
             {
                 case 1:
-                    BigDecimal codigo = BigDecimal.valueOf(Teclado.introInt("Nuevo codigo del grupo: "));                  
+                    BigDecimal codigo = BigDecimal.valueOf(Teclado.introInt("Nuevo codigo del grupo: "));
                     grupo.setCodgrupo(codigo);
                     break;
                 case 2:
@@ -275,7 +296,7 @@ public class GestorDB {
                     break;
                 case 4:
                     grupo.setEstilo(Teclado.introString("Nuevo estilo del grupo: "));
-                    break;    
+                    break;
                 case 5:
                     grupo.setEsgrupo(Teclado.introBoolean("Es grupo? "));
                     break;
@@ -284,28 +305,29 @@ public class GestorDB {
                     break;
                 case 7:
                     grupo.setFechaestreno(Date.valueOf(Teclado.introFecha("Nueva fecha de estreno")));
-                    break;    
+                    break;
                 case 8:
                     grupo.setCompania(Teclado.introString("Nueva compania del grupo: "));
-                    break;    
-            }
-            
-            String sqlUpdate = "UPDATE grupo SET codgrupo = " + grupo.getCodgrupo() + ", "
+                    break;
+            }          
+
+            String sqlUpdate = "UPDATE grupos SET codgrupo = " + grupo.getCodgrupo() + ", "
                     + "nombre = '" + grupo.getNombre() + "', "
-                    + "localidad = '" + grupo.getLocalidad() + "' "
-                    + "estilo = '" + grupo.getEstilo() + "' "
-                    + "esgrupo = " + grupo.isEsgrupo() + " "
-                    + "annograb = " + grupo.getAnnograb() + " "
-                    + "fechaestreno = '" + grupo.getFechaestreno().toString() + "' "
-                    + "comania = '" + grupo.getCompania() + "' "
-                    + "WHERE codgrupo = '" + nombreGrupo + "';";
-            
+                    + "localidad = '" + grupo.getLocalidad() + "', "
+                    + "estilo = '" + grupo.getEstilo() + "', "
+                    + "esgrupo = " + grupo.isEsgrupo() + ", "
+                    + "annograb = " + grupo.getAnnograb() + ", "
+                    + "fechaestreno = '" + grupo.getFechaestreno().toString() + "', "
+                    + "compania = '" + grupo.getCompania() + "' "
+                    + "WHERE nombre = '" + nombreGrupo + "';";
+
             Statement stUpdate = conexion.createStatement();
-            int resultUpdate = stUpdate.executeUpdate(sqlUpdate); 
+            int resultUpdate = stUpdate.executeUpdate(sqlUpdate);
             //Result es el numero de filas afectadas por Update
 
             System.out.println("Se modificó " + resultUpdate + " datos");
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
             System.out.println(ex.toString());
         }
     }

@@ -1,0 +1,78 @@
+[
+  {
+    "identificador": 10,
+    "nombre": "InmoCant",
+    "numeroEmpleados": 3,
+    "inmuebles": [
+      {
+        "nombre": "Casa en la costa",
+        "precio": 264000.0,
+        "descripcion": "Bonita casa"
+      }
+    ]
+  },
+  {
+    "identificador": 20,
+    "nombre": "Inmobiliaria del Norte",
+    "numeroEmpleados": 12,
+    "inmuebles": [
+      {
+        "nombre": "Piso en el centro",
+        "precio": 140000.0,
+        "descripcion": "¡Gran oportunidad!"
+      }
+    ]
+  },
+  {
+    "identificador": 30,
+    "nombre": "La Gran Inmobiliaria",
+    "numeroEmpleados": 25,
+    "inmuebles": []
+  },
+  {
+    "identificador": 40,
+    "nombre": "No Vendo Nada",
+    "numeroEmpleados": 2,
+    "inmuebles": []
+  },
+  {
+    "identificador": 50,
+    "nombre": "La Continental",
+    "numeroEmpleados": 3,
+    "inmuebles": []
+  },
+  {
+    "identificador": 100,
+    "nombre": "InmoSur",
+    "numeroEmpleados": 20,
+    "inmuebles": [
+      {
+        "nombre": "Piso de 3 dormitorios",
+        "precio": 150000.0,
+        "descripcion": "Segunda planta con ascensor"
+      },
+      {
+        "nombre": "Piso para reformar",
+        "precio": 70000.0,
+        "descripcion": "Primera planta con garaje"
+      }
+    ]
+  },
+  {
+    "identificador": 110,
+    "nombre": "Lo Vendo Todo",
+    "numeroEmpleados": 35,
+    "inmuebles": [
+      {
+        "nombre": "Plaza de garaje",
+        "precio": 25000.0,
+        "descripcion": "Muy espaciosa"
+      },
+      {
+        "nombre": "Chalet de lujo",
+        "precio": 750000.0,
+        "descripcion": "Excelentes calidades"
+      }
+    ]
+  }
+]

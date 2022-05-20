@@ -89,7 +89,7 @@ public class Main_H3E1 {
     public static void insertarCanciones(Connection conexion){
         int numGrupo = Teclado.introInt("Numero del grupo:");
         
-        String sql = "INSERT INTO canciones (numcancion, titulo, duracion, numgrupo, votos) "
+        String sql = "INSERT INTO canciones (numcancion, titulo, duracion, grupo, votos) "
                 + "VALUES (?,?,?,?,0);";
         
         while(true){
@@ -98,7 +98,7 @@ public class Main_H3E1 {
                 
                 consultaPreparada.setInt(1, Teclado.introInt("Numero Cancion: "));
                 
-                String titulo = Teclado.introString("Titulo Cancion: ");
+                String titulo = Teclado.introString("Titulo Cancion[Intro en blanco para salir]: ");
                 if (titulo.length() == 0) break;
                 
                 consultaPreparada.setString(2, titulo);
