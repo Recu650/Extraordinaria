@@ -78,8 +78,8 @@ public class GestorDB {
             while (resultVoto.next()) {
                 Voto voto = new Voto();
                 Cancion cancion = new Cancion();
-
-                voto.setUsuario(resultVoto.getString("usuario"));
+                Usuario usuario = new Usuario();
+               
                 voto.setFecha(resultVoto.getDate("fecha"));
 
                 String sqlCancion = "SELECT * FROM canciones WHERE id = " + resultVoto.getInt("cancion") + ";";
@@ -90,6 +90,23 @@ public class GestorDB {
                     cancion.setNumcancion(resultCancion.getInt("id"));
                     cancion.setDuracion(resultCancion.getTime("duracion"));
                     cancion.setTitulo(resultCancion.getString("titulo"));
+                    cancion.setTotal_votos(resultCancion.getInt("total_votos"));
+                    
+                    voto.setCancion(cancion);
+                }
+                
+                String sqlUsuario = "SELECT * FROM usuarios WHERE user = '" + resultVoto.getString("usuario") + "';";
+                Statement stUsuario = this.conexion.createStatement();
+                ResultSet resultUsuario = stUsuario.executeQuery(sqlUsuario);
+                
+                while(resultUsuario.next()){
+                    usuario.setUsuario(resultUsuario.getString("user"));
+                    usuario.setPassword(resultUsuario.getString("contraseña"));
+                    usuario.setNombre(resultUsuario.getString("nombre"));
+                    usuario.setApellidos(resultUsuario.getString("apellidos"));
+                    usuario.setFechanacimiento(resultUsuario.getDate("fechanac"));
+                    
+                    voto.setUsuario(usuario);
                 }
 
                 votos.add(voto);
@@ -100,5 +117,6 @@ public class GestorDB {
         return votos;
     }
     
+    public void ModificarUsuario(Usuario usuarioNuevo String)
     
 }

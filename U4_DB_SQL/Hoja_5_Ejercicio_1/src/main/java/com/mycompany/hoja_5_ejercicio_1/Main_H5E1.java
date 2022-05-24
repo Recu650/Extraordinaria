@@ -5,6 +5,9 @@
  */
 package com.mycompany.hoja_5_ejercicio_1;
 
+import java.time.ZoneId;
+import java.util.Date;
+
 /**
  *
  * @author usuario
@@ -42,7 +45,7 @@ public class Main_H5E1 {
                     break;
                 case 2:
                     for (Voto voto : gestor.cincoUltimosVotos()) {
-                        System.out.println("Usuario: " + voto.getUsuario()
+                        System.out.println("Usuario: " + voto.getUsuario().getNombre()
                                 + "\tFecha: " + voto.getFecha()
                                 + "\tCancion: " + voto.getCancion().getTitulo() + " - "
                                 + voto.getCancion().getDuracion());
@@ -59,6 +62,17 @@ public class Main_H5E1 {
                             
                             switch(select2) {
                                 case 1:
+                                    System.out.println("|-----NUEVO USUARIO------|");
+                                    Usuario usuarioNuevo = new Usuario();
+                                    usuarioNuevo.setUsuario(Teclado.introString("Nuevo Usuario: "));
+                                    usuarioNuevo.setPassword(Teclado.introString("Nueva contrasenia: "));
+                                    usuarioNuevo.setNombre(Teclado.introString("Nuevo Nombre: "));
+                                    usuarioNuevo.setApellidos(Teclado.introString("Nuevos Apellidos: "));
+                                    usuarioNuevo.setFechanacimiento(
+                                            Date.from(Teclado.introFecha("Nueva fecha de nacimiento: ")
+                                                    .atStartOfDay(ZoneId.systemDefault())
+                                                    .toInstant()));
+
                                     break;
                                 case 2:
                                     break;

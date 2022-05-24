@@ -8,18 +8,18 @@ import java.util.Date;
  */
 public class Voto {
 
-    private String usuario;
+    private Usuario usuario;
     private Date fecha;
     private Cancion cancion;
 
     public Voto() {
     }
 
-    public String getUsuario() {
+    public Usuario getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(String usuario) {
+    public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 
