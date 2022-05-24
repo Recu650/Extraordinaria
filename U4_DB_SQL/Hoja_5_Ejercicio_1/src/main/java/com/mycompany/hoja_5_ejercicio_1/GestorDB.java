@@ -18,42 +18,29 @@ import java.util.logging.Logger;
 public class GestorDB {
     private Connection conexion;
 
-    public GestorDB()
-    {
-        try
-        {
-            Class.forName("org.postgresql.Driver");
-            conexion = DriverManager.getConnection(
-                    "jdbc:postgresql://127.0.0.1/concursomusicacompleto",
-                    "postgres", "PassWd!10");
-        } catch (ClassNotFoundException ex)
-        {
-            System.out.println(ex.toString());
-        } catch (SQLException ex)
-        {
-            System.out.println(ex.toString());
-        }
+    public GestorDB() {
+        this.conexion = Conexion.getInstance().getConnection();
     }
-    
+
     public List<Componente> listadoComponentes(int idGrupo) {
         List<Componente> componentes = new ArrayList();
-        try{
+        try {
             String sql = "SELECT * FROM componentes WHERE grupo = '" + idGrupo + "' ORDER BY idcomp;";
             Statement st = conexion.createStatement();
             ResultSet result = st.executeQuery(sql);
-            
-            while(result.next()){
+
+            while (result.next()) {
                 Componente componente = new Componente();
-                
+
                 componente.setIdcomp(result.getBigDecimal("idcomp"));
                 componente.setNombre(result.getString("nombre"));
                 componente.setApellido(result.getString("apellido"));
                 componente.setAlias(result.getString("alias"));
-                
+
                 Grupo grupo = new Grupo();
                 grupo.setCodgrupo(BigDecimal.valueOf(result.getInt("grupo")));
                 componente.setGrupo(grupo);
-                
+
                 componentes.add(componente);
             }
         } catch (SQLException ex) {
@@ -61,21 +48,57 @@ public class GestorDB {
         }
         return componentes;
     }
-    
+
     public boolean modificarAlias(BigDecimal idcomp) {
         boolean modificado = false;
-        try{
+        try {
             String nuevoAlias = Teclado.introString("Nuevo Alias: ");
             String sql = "UPDATE componentes "
                     + "SET alias = " + nuevoAlias + " WHERE idcomp = " + idcomp + ";";
-            
+
             Statement st = conexion.createStatement();
             int resultUpdate = st.executeUpdate(sql);
-            
-            if(resultUpdate > 0) modificado = true;
+
+            if (resultUpdate > 0)
+                modificado = true;
         } catch (SQLException ex) {
             System.out.println(ex.toString());
         }
         return modificado;
     }
+
+    public List<Voto> cincoUltimosVotos() {
+        List<Voto> votos = new ArrayList();
+
+        try {
+            String sqlVoto = "SELECT usuario, fecha, cancion FROM votos ORDER BY fecha DESC LIMIT 5;";
+            Statement stVoto = this.conexion.createStatement();
+            ResultSet resultVoto = stVoto.executeQuery(sqlVoto);
+
+            while (resultVoto.next()) {
+                Voto voto = new Voto();
+                Cancion cancion = new Cancion();
+
+                voto.setUsuario(resultVoto.getString("usuario"));
+                voto.setFecha(resultVoto.getDate("fecha"));
+
+                String sqlCancion = "SELECT * FROM canciones WHERE id = " + resultVoto.getInt("cancion") + ";";
+                Statement stCancion = this.conexion.createStatement();
+                ResultSet resultCancion = stCancion.executeQuery(sqlCancion);
+                
+                while(resultCancion.next()){
+                    cancion.setNumcancion(resultCancion.getInt("id"));
+                    cancion.setDuracion(resultCancion.getTime("duracion"));
+                    cancion.setTitulo(resultCancion.getString("titulo"));
+                }
+
+                votos.add(voto);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        }
+        return votos;
+    }
+    
+    
 }
