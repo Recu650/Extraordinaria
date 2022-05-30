@@ -24,7 +24,7 @@ public class Main_H5E1 {
         do {
             System.out.println("|----------MENU----------|");
             System.out.println("| 1.Modificar Alias      |");
-            System.out.println("| 2.|");
+            System.out.println("| 2.5 Ultimos Votos      |");
             System.out.println("| 3.|");
             System.out.println("| 0.Salir                |");
             System.out.println("|------------------------|");
@@ -72,16 +72,28 @@ public class Main_H5E1 {
                                             Date.from(Teclado.introFecha("Nueva fecha de nacimiento: ")
                                                     .atStartOfDay(ZoneId.systemDefault())
                                                     .toInstant()));
-
+                                    
+                                    gestor.ModificarUsuario(usuarioNuevo, voto.getUsuario().getUsuario());
                                     break;
                                 case 2:
+                                    if(Teclado.introBoolean("Seguro que quieres eliminar el voto? ")){
+                                        if(gestor.EliminarVoto(voto)){
+                                            System.out.println("Voto eliminado");
+                                        }
+                                    }else System.out.println("No eliminamos.");
+                                    
                                     break;
                             }
                         } while (select2 != 1 || select2 != 2);
-
                     }
                     break;
                 case 3:
+                    for(Voto voto: gestor.votosUsuario(Teclado.introString("Nombre de Usuario: "))){
+                        System.out.println(voto.getCancion().getTitulo() + "\t" + voto.getFecha().toString());
+                        if(Teclado.introBoolean("Rectificar? ")){
+                            gestor.rectificarVoto(voto);
+                        }else System.out.println("No rectificamos");
+                    }
                     break;
                 case 0:
                     break;
