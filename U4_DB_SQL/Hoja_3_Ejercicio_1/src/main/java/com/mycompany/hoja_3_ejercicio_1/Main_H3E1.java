@@ -89,7 +89,7 @@ public class Main_H3E1 {
     public static void insertarCanciones(Connection conexion){
         int numGrupo = Teclado.introInt("Numero del grupo:");
         
-        String sql = "INSERT INTO canciones (numcancion, titulo, duracion, grupo, votos) "
+        String sql = "INSERT INTO canciones (numcancion, titulo, duracion, numgrupo, votos) "
                 + "VALUES (?,?,?,?,0);";
         
         while(true){

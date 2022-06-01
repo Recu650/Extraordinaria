@@ -56,7 +56,8 @@ public class GestorDB {
         try {
             String nuevoAlias = Teclado.introString("Nuevo Alias: ");
             String sql = "UPDATE componentes "
-                    + "SET alias = " + nuevoAlias + " WHERE idcomp = " + idcomp + ";";
+                    + "SET alias = '" + nuevoAlias + "' WHERE idcomp = " + idcomp + ";";
+            System.out.println(sql);
 
             Statement st = conexion.createStatement();
             int resultUpdate = st.executeUpdate(sql);
@@ -73,7 +74,7 @@ public class GestorDB {
         List<Voto> votos = new ArrayList();
 
         try {
-            String sqlVoto = "SELECT usuario, fecha, cancion FROM votos ORDER BY fecha DESC LIMIT 5;";
+            String sqlVoto="SELECT usuario, fecha, cancion FROM votos ORDER BY fecha DESC LIMIT 5;";
             Statement stVoto = this.conexion.createStatement();
             ResultSet resultVoto = stVoto.executeQuery(sqlVoto);
 
@@ -84,12 +85,13 @@ public class GestorDB {
 
                 voto.setFecha(resultVoto.getDate("fecha"));
 
-                String sqlCancion = "SELECT * FROM canciones WHERE id = " + resultVoto.getInt("cancion") + ";";
+                String sqlCancion = "SELECT * FROM canciones WHERE numcancion = " 
+                        + resultVoto.getInt("cancion") + ";";
                 Statement stCancion = this.conexion.createStatement();
                 ResultSet resultCancion = stCancion.executeQuery(sqlCancion);
 
                 while (resultCancion.next()) {
-                    cancion.setNumcancion(resultCancion.getInt("id"));
+                    cancion.setNumcancion(resultCancion.getInt("numcancion"));
                     cancion.setDuracion(resultCancion.getTime("duracion"));
                     cancion.setTitulo(resultCancion.getString("titulo"));
                     cancion.setTotal_votos(resultCancion.getInt("total_votos"));
@@ -97,7 +99,8 @@ public class GestorDB {
                     voto.setCancion(cancion);
                 }
 
-                String sqlUsuario = "SELECT * FROM usuarios WHERE user = '" + resultVoto.getString("usuario") + "';";
+                String sqlUsuario = "SELECT * FROM usuarios WHERE \"user\" = '" 
+                        + resultVoto.getString("usuario") + "';";
                 Statement stUsuario = this.conexion.createStatement();
                 ResultSet resultUsuario = stUsuario.executeQuery(sqlUsuario);
 
@@ -110,7 +113,6 @@ public class GestorDB {
 
                     voto.setUsuario(usuario);
                 }
-
                 votos.add(voto);
             }
         } catch (SQLException ex) {
@@ -124,7 +126,7 @@ public class GestorDB {
         try {
             String sql = "UPDATE usuarios SET \"user\" = ?, contraseña = md5(?), "
                     + "nombre = ?, apellidos = ?, fechanac = ? "
-                    + "WHERE user = ?;";
+                    + "WHERE \"user\" = ?;";
             PreparedStatement pst = this.conexion.prepareStatement(sql);
 
             pst.setString(1, usuarioNuevo.getUsuario());
@@ -148,7 +150,7 @@ public class GestorDB {
     public boolean EliminarVoto(Voto voto) {
         boolean eliminado = false;
         try {
-            String sqlVotos = "DELETE FROM votos USING votos "
+            String sqlVotos = "DELETE FROM votos "
                     + "WHERE votos.usuario = ? "
                     + "AND votos.fecha = ? "
                     + "AND votos.cancion = ?;";
@@ -176,15 +178,16 @@ public class GestorDB {
             String sql = "SELECT * FROM votos WHERE usuario = '" + user + "';";
             Statement st = this.conexion.createStatement();
             ResultSet resultVoto = st.executeQuery(sql);
-            
-            while(resultVoto.next()){
+
+            while (resultVoto.next()) {
                 Voto voto = new Voto();
                 Cancion cancion = new Cancion();
                 Usuario usuario = new Usuario();
 
                 voto.setFecha(resultVoto.getDate("fecha"));
 
-                String sqlCancion = "SELECT * FROM canciones WHERE id = " + resultVoto.getInt("cancion") + ";";
+                String sqlCancion = "SELECT * FROM canciones WHERE id = " 
+                        + resultVoto.getInt("cancion") + ";";
                 Statement stCancion = this.conexion.createStatement();
                 ResultSet resultCancion = stCancion.executeQuery(sqlCancion);
 
@@ -197,7 +200,8 @@ public class GestorDB {
                     voto.setCancion(cancion);
                 }
 
-                String sqlUsuario = "SELECT * FROM usuarios WHERE user = '" + resultVoto.getString("usuario") + "';";
+                String sqlUsuario = "SELECT * FROM usuarios WHERE user = '" 
+                        + resultVoto.getString("usuario") + "';";
                 Statement stUsuario = this.conexion.createStatement();
                 ResultSet resultUsuario = stUsuario.executeQuery(sqlUsuario);
 
@@ -211,7 +215,7 @@ public class GestorDB {
                     voto.setUsuario(usuario);
                 }
 
-                votos.add(voto);                 
+                votos.add(voto);
             }
 
         } catch (SQLException ex) {
@@ -219,18 +223,19 @@ public class GestorDB {
         }
         return votos;
     }
-    
+
     public boolean rectificarVoto(Voto voto) {
         boolean rectificado = false;
-        try{
-            String sql = "UPDATE votos SET fechanac = ? WHERE usuario = ? AND fechanac = ? AND cancion = ?;";
+        try {
+            String sql = "UPDATE votos SET fechanac = ? "
+                    + "WHERE usuario = ? AND fechanac = ? AND cancion = ?;";
             PreparedStatement pst = this.conexion.prepareStatement(sql);
-            
+
             pst.setDate(1, Date.valueOf(LocalDate.now()));
             pst.setString(2, voto.getUsuario().getUsuario());
             pst.setDate(3, (Date) voto.getFecha());
             pst.setInt(4, voto.getCancion().getNumcancion());
-            
+
             int n = pst.executeUpdate();
             if (n == 1) {
                 System.out.println("Insertado Correctamente");
@@ -239,7 +244,7 @@ public class GestorDB {
         } catch (SQLException ex) {
             System.out.println(ex.toString());
         }
-        
+
         return rectificado;
     }
 

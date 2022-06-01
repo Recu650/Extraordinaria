@@ -6,6 +6,7 @@ import java.math.BigDecimal;
  *
  * @author usuario
  */
+
 public class Componente {
     private BigDecimal idcomp;
     private String nombre;

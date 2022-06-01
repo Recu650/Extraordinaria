@@ -6,6 +6,7 @@ import java.util.Date;
  *
  * @author usuario
  */
+
 public class Voto {
 
     private String usuario;
@@ -14,27 +15,22 @@ public class Voto {
 
     public Voto() {
     }
-
+    
     public String getUsuario() {
         return usuario;
     }
-
     public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
-
     public Date getFecha() {
         return fecha;
     }
-
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
-
     public Cancion getCancion() {
         return cancion;
     }
-
     public void setCancion(Cancion cancion) {
         this.cancion = cancion;
     }

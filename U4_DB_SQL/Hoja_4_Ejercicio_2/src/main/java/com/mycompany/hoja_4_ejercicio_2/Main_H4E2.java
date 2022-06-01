@@ -12,10 +12,6 @@ import java.util.List;
  * @author usuario
  */
 public class Main_H4E2 {
-
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         GestorDB gestor = new GestorDB();
         List<Grupo> grupos;
@@ -83,18 +79,18 @@ public class Main_H4E2 {
                     break;
                 case 6:
                     grupos = gestor.listadoGruposCanciones();
-                    for(Grupo grupo: grupos){
-                        if(grupo.getCanciones().size() == 0){
+                    for (Grupo grupo : grupos) {
+                        if (grupo.getCanciones().size() == 0) {
                             System.out.println(grupo.getNombre() + " no tiene canciones");
                         }
                     }
                     break;
                 case 7:
                     votos = gestor.votosMasRecientes();
-                    for(Voto voto: votos){
-                        System.out.println("Titulo: " + voto.getCancion().getTitulo() +
-                                "\tGrupo: " + voto.getCancion().getGrupo().getNombre() + 
-                                "\tFecha: " + voto.getFecha());
+                    for (Voto voto : votos) {
+                        System.out.println("Titulo: " + voto.getCancion().getTitulo()
+                                + "\tGrupo: " + voto.getCancion().getGrupo().getNombre()
+                                + "\tFecha: " + voto.getFecha());
                     }
                     break;
                 case 8:

@@ -5,10 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author usuario
- */
+
 public class Grupo {
     private BigDecimal codgrupo;
     private String nombre;
