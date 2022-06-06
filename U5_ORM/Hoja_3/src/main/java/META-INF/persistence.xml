@@ -3,6 +3,7 @@
 	<persistence-unit name="PrimerProyecto" transaction-type="RESOURCE_LOCAL">
 		<class>es.hectorsanchez.Hoja_2.Empleado</class>
 		<class>es.hectorsanchez.Hoja_2.Sueldo</class>
+		<class>es.hectorsanchez.Hoja_2.Departamento</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3310/empresa"/>
